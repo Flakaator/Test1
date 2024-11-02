@@ -1,6 +1,4 @@
-import dash
-import dash_bootstrap_components as dbc
-from dash import dcc, html, Input, Output, State
+import streamlit as st
 import plotly.express as px
 import pandas as pd
 
@@ -10,41 +8,18 @@ df = pd.DataFrame({
     'y': [10, 11, 12, 13, 14]
 })
 
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+st.title("Interactive Scatter Plot with Questionnaire")
 
-# Layout with scatter plot and hidden questionnaire modal
-app.layout = html.Div([
-    dcc.Graph(
-        id='scatter-plot',
-        figure=px.scatter(df, x='x', y='y')
-    ),
-    dbc.Modal(
-        [
-            dbc.ModalHeader("Questionnaire"),
-            dbc.ModalBody([
-                dbc.Label("Question 1"),
-                dbc.Input(type="text", placeholder="Your answer here", id="answer1"),
-                # Add more questions here
-            ]),
-            dbc.ModalFooter(
-                dbc.Button("Close", id="close-modal", className="ml-auto")
-            ),
-        ],
-        id="questionnaire-modal",
-        is_open=False,
-    )
-])
+# Scatter plot
+fig = px.scatter(df, x='x', y='y')
+scatter_plot = st.plotly_chart(fig)
 
-# Callback to open questionnaire on scatter plot click
-@app.callback(
-    Output("questionnaire-modal", "is_open"),
-    [Input("scatter-plot", "clickData"), Input("close-modal", "n_clicks")],
-    [State("questionnaire-modal", "is_open")]
-)
-def toggle_modal(clickData, close_click, is_open):
-    if clickData or close_click:
-        return not is_open
-    return is_open
+# Questionnaire visibility toggle
+if st.session_state.get("show_questionnaire", False):
+    st.write("### Questionnaire")
+    st.text_input("Question 1", "Your answer here")
+    st.button("Submit", on_click=lambda: st.session_state.update(show_questionnaire=False))
+else:
+    if st.button("Show Questionnaire"):
+        st.session_state.show_questionnaire = True
 
-if __name__ == "__main__":
-    app.run_server(debug=True)
