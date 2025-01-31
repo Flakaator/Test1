@@ -1,9 +1,6 @@
-dash
-dash_bootstrap_components
-plotly.express
-pandas 
+streamlit
 requests
-bs4 
-time
-random
-io
+beautifulsoup4
+pandas
+xlsxwriter
+lxml
